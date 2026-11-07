@@ -1,0 +1,77 @@
+{
+  "name": "VULN-01 Command Injection (Execute Command)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cmd",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "e36612da-e8a6-4ff3-9699-d2dc1e3f9e13",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-220, 0],
+      "webhookId": "269fd4d0-742b-4242-a714-562662c2acb2"
+    },
+    {
+      "parameters": {
+        "command": "=ping -c 1 {{ $json.body.host }}"
+      },
+      "id": "e7c3f382-25c5-4bca-99d5-eb99dcf69ef0",
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Zafiyetli: komut çıktısı ham olarak döndürülür\nreturn [{ json: { stdout: $json.stdout, stderr: $json.stderr } }];"
+      },
+      "id": "6690dd7b-b14b-4532-a830-9903a736fdf1",
+      "name": "Return Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [220, 0]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Return Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "567812fa-99e2-4278-abd3-9e04a8507ae9",
+  "id": "55c809a9-c964-4c80-8ee5-a45e3e55c4e0",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "tags": [
+    {
+      "id": "1f7465d9-8e7f-4cdf-8108-9b14daf80608",
+      "name": "vulnerable"
+    }
+  ]
+}

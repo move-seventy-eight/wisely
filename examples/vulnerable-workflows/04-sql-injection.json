@@ -1,0 +1,63 @@
+{
+  "name": "VULN-04 SQL Injection (Postgres)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lookup",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "50087ef3-aea2-481b-a856-cf8d8a8f639e",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-220, 0],
+      "webhookId": "caccc299-f01f-464c-9c75-ce4b63081755"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=SELECT * FROM users WHERE username = '{{ $json.body.username }}'"
+      },
+      "id": "8379f57b-1c8d-4d9e-9971-db0bf3d16d9f",
+      "name": "Postgres (unsafe query)",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.4,
+      "position": [0, 0],
+      "credentials": {
+        "postgres": {
+          "id": "a33f403f-664c-4d69-be18-0d880b0d3499",
+          "name": "TEST Postgres (replace with your credential)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Postgres (unsafe query)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "c8673a7c-4b41-43e7-a92d-8c983125de1d",
+  "id": "af9ceac2-cf58-4226-9cab-eae35b08d665",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "pinData": {},
+  "tags": [
+    {
+      "id": "927335dd-638d-410f-b91d-09e0c7b1eb58",
+      "name": "vulnerable"
+    }
+  ]
+}

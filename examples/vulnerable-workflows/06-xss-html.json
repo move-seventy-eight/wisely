@@ -1,0 +1,56 @@
+{
+  "name": "VULN-06 XSS (HTML render)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "render",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "96865f9a-8e33-47b0-b4d1-9fd34e76c165",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-220, 0],
+      "webhookId": "b9adb037-57bc-4f2d-a305-6ff8f1769ec1"
+    },
+    {
+      "parameters": {
+        "html": "=<h1>Hello {{ $json.body.name }}</h1><p>{{ $json.body.message }}</p>"
+      },
+      "id": "e6e3e710-15bc-4af8-8b4a-19579cec59f4",
+      "name": "HTML (unsanitized)",
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 2,
+      "position": [0, 0]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTML (unsanitized)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "9ffaecd2-0416-4b12-b460-44f7286732ab",
+  "id": "2a15b5f6-5bbb-4968-8078-9e4bbe1a3d4e",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "tags": [
+    {
+      "id": "bd933ebe-14e1-4e23-b132-4a0555e73365",
+      "name": "vulnerable"
+    }
+  ]
+}

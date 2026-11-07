@@ -1,0 +1,55 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# Testing & Coverage
+/coverage
+
+# Next.js build output
+/.next/
+/out/
+/build
+
+# Database files
+*.db
+*.db-journal
+*.db.bak
+*.sqlite
+*.sqlite-journal
+
+# Promptfoo outputs & cache
+/.promptfoo/
+/.cache/
+
+# Environment variables
+.env
+.env*.local
+!.env.example
+
+# OS & Logs
+.DS_Store
+Thumbs.db
+*.pem
+*.log
+npm-debug.log*
+yarn-debug.log*
+
+# Vercel & IDE
+.vercel
+.idea
+.vscode
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Presentations & Internal Demo Materials
+presentation-assets/
+*.pptx
+*speaking-script*
+*SPEAKING_SCRIPT*
+*textream*
+*TEXTREAM*
+
+# Generated Prisma Client
+/src/generated/

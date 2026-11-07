@@ -1,0 +1,31 @@
+services:
+  wisely:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: wisely:latest
+    container_name: wisely-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+      - "127.0.0.1:15500:15500" # Promptfoo arayüzünü yalnızca güvenli yerel ağa/tersine vekile bağlar
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=file:/app/prisma/dev.db
+      - NEXT_PUBLIC_PROMPTFOO_URL=${NEXT_PUBLIC_PROMPTFOO_URL:-http://localhost:15500}
+      - N8N_BASE_URL=${N8N_BASE_URL:-http://localhost:5678}
+      - N8N_API_KEY=${N8N_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+    volumes:
+      # Veritabanı ve promptfoo tarama verilerinin sunucu yeniden başlasa da korunması
+      - wisely-data:/app/prisma
+      - wisely-promptfoo:/app/.promptfoo
+
+volumes:
+  wisely-data:
+    driver: local
+  wisely-promptfoo:
+    driver: local

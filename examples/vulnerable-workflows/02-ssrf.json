@@ -1,0 +1,61 @@
+{
+  "name": "VULN-02 SSRF (HTTP Request)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "fetch",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "6577b0dd-d16f-46d5-b9e3-2fa4e00d3c03",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-220, 0],
+      "webhookId": "942fb8e6-a9ff-43b3-bb0d-0c6dd01b4e0d"
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.body.url }}",
+        "sendQuery": false,
+        "sendHeaders": false,
+        "sendBody": false,
+        "options": {}
+      },
+      "id": "92e7d39c-49cf-44a2-9e86-28332813a0f0",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [0, 0]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "e6a6ea0b-a3a6-4743-ab3d-25a3df0457b8",
+  "id": "91562019-c5d4-444f-afb2-9f66494f8cf8",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "tags": [
+    {
+      "id": "a7c87df2-7a7a-459d-a9e3-b780bf396b9b",
+      "name": "vulnerable"
+    }
+  ]
+}

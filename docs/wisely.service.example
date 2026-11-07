@@ -1,0 +1,46 @@
+# ==============================================================================
+# Wisely - Production Linux Systemd Service Dosyası
+# ==============================================================================
+# Kurulum Adımları:
+# 1. Dosyayı kopyalayın:
+#    sudo cp docs/wisely.service.example /etc/systemd/system/wisely.service
+# 2. İhtiyacınıza göre User ve WorkingDirectory yollarını güncelleyin:
+#    sudo nano /etc/systemd/system/wisely.service
+# 3. Systemd daemon'ı yenileyin ve servisi etkinleştirin:
+#    sudo systemctl daemon-reload
+#    sudo systemctl enable wisely
+#    sudo systemctl start wisely
+# 4. Servis durumunu kontrol edin:
+#    sudo systemctl status wisely
+# 5. Logları izleyin:
+#    sudo journalctl -u wisely -f
+# ==============================================================================
+
+[Unit]
+Description=Wisely AI Security & Threat Management Platform
+Documentation=https://github.com/move-seventy-eight/wisely
+After=network.target
+
+[Service]
+Type=simple
+User=node
+WorkingDirectory=/opt/wisely
+Environment=NODE_ENV=production
+Environment=PORT=3000
+Environment=DATABASE_URL=file:/opt/wisely/prisma/dev.db
+EnvironmentFile=-/opt/wisely/.env
+ExecStart=/usr/bin/npm run start:prod
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=wisely-app
+
+# Güvenlik Sıkılaştırma Kriterleri (Systemd Sandboxing)
+NoNewPrivileges=true
+ProtectSystem=full
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

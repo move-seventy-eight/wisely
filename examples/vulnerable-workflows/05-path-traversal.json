@@ -1,0 +1,57 @@
+{
+  "name": "VULN-05 Path Traversal (Read File)",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "readfile",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "910a25b1-578d-4d11-91d9-37f63248b720",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-220, 0],
+      "webhookId": "7a3973e8-4914-4602-9ad6-50ae8aa2aece"
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "fileName": "={{ $json.body.file }}"
+      },
+      "id": "7b8a6647-ae5f-43b4-afb6-9702b5700253",
+      "name": "Read File (unsafe path)",
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [0, 0]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Read File (unsafe path)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "50366d83-11c9-467d-a6e1-7451622c4465",
+  "id": "ba77fe8f-5eb4-4218-b10b-80dafe6c9bfd",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "tags": [
+    {
+      "id": "08cab9d2-ab1d-4d60-8a04-48f737811828",
+      "name": "vulnerable"
+    }
+  ]
+}

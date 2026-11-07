@@ -1,0 +1,72 @@
+{
+  "name": "VULN-07 Unauthenticated Webhook",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "public-action",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "f167b5e3-17ca-4435-9d1a-804dd7aec318",
+      "name": "Webhook (no auth)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [-220, 0],
+      "webhookId": "93a7a166-6c19-41ad-85c6-4ab8ed52a138"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2ce35c90-e486-44ee-8d76-0881d2925c37",
+              "name": "status",
+              "value": "action executed",
+              "type": "string"
+            },
+            {
+              "id": "c328d435-78c5-4fb7-a474-9c3ffe3432a5",
+              "name": "receivedAt",
+              "value": "={{ $now.toISOString() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1f7465d9-8e7f-4cdf-8108-9b14daf80609",
+      "name": "Set Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [0, 0]
+    }
+  ],
+  "connections": {
+    "Webhook (no auth)": {
+      "main": [
+        [
+          {
+            "node": "Set Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "caccc299-f01f-464c-9c75-ce4b63081756",
+  "id": "8379f57b-1c8d-4d9e-9971-db0bf3d16da0",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "tags": [
+    {
+      "id": "a33f403f-664c-4d69-be18-0d880b0d349a",
+      "name": "vulnerable"
+    }
+  ]
+}

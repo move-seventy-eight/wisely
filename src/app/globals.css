@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: 204 60% 98%;
+  --foreground: 215 40% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 215 40% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 215 40% 12%;
+  --primary: 199 89% 65%;
+  --primary-foreground: 215 50% 10%;
+  --secondary: 204 45% 94%;
+  --secondary-foreground: 215 40% 15%;
+  --muted: 204 45% 95%;
+  --muted-foreground: 215 20% 48%;
+  --accent: 204 45% 93%;
+  --accent-foreground: 215 40% 15%;
+  --destructive: 354 75% 72%;
+  --destructive-foreground: 354 60% 18%;
+  --border: 204 35% 89%;
+  --input: 204 35% 89%;
+  --ring: 199 89% 65%;
+  --radius: 0.75rem;
+  --chart-1: 199 85% 68%;
+  --chart-2: 152 55% 68%;
+  --chart-3: 45 80% 72%;
+  --chart-4: 24 80% 72%;
+  --chart-5: 354 70% 72%;
+}
+
+.dark {
+  --background: 215 40% 8%;
+  --foreground: 204 60% 96%;
+  --card: 215 40% 11%;
+  --card-foreground: 204 60% 96%;
+  --popover: 215 40% 11%;
+  --popover-foreground: 204 60% 96%;
+  --primary: 199 89% 68%;
+  --primary-foreground: 215 50% 10%;
+  --secondary: 215 30% 16%;
+  --secondary-foreground: 204 60% 96%;
+  --muted: 215 30% 16%;
+  --muted-foreground: 215 20% 65%;
+  --accent: 215 30% 16%;
+  --accent-foreground: 204 60% 96%;
+  --destructive: 354 65% 65%;
+  --destructive-foreground: 354 80% 95%;
+  --border: 215 30% 18%;
+  --input: 215 30% 18%;
+  --ring: 199 89% 68%;
+  --chart-1: 199 80% 70%;
+  --chart-2: 152 50% 68%;
+  --chart-3: 45 75% 70%;
+  --chart-4: 24 75% 70%;
+  --chart-5: 354 65% 70%;
+}
+
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* --- ASI Threat Modeler Specific Styles --- */
+@layer base {
+  :root {
+    /* Security status colors - Soft Pastel Palette */
+    --security-critical: 354 75% 70%;
+    --security-high: 24 85% 72%;
+    --security-medium: 45 80% 70%;
+    --security-low: 152 55% 65%;
+    --security-info: 199 85% 65%;
+  }
+
+  .dark {
+    /* Security status colors (dark mode) - Soft Pastel Palette */
+    --security-critical: 354 65% 65%;
+    --security-high: 24 75% 68%;
+    --security-medium: 45 75% 65%;
+    --security-low: 152 50% 60%;
+    --security-info: 199 80% 68%;
+  }
+
+  /* Status indicators - Soft Pastel */
+  .status-critical {
+    @apply bg-rose-50 text-rose-700 border border-rose-200/70 dark:bg-rose-950/30 dark:text-rose-300 dark:border-rose-900/40;
+  }
+
+  .status-high {
+    @apply bg-orange-50 text-orange-700 border border-orange-200/70 dark:bg-orange-950/30 dark:text-orange-300 dark:border-orange-900/40;
+  }
+
+  .status-medium {
+    @apply bg-amber-50 text-amber-700 border border-amber-200/70 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-900/40;
+  }
+
+  .status-low {
+    @apply bg-emerald-50 text-emerald-700 border border-emerald-200/70 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-900/40;
+  }
+
+  .status-info {
+    @apply bg-sky-50 text-sky-700 border border-sky-200/70 dark:bg-sky-950/30 dark:text-sky-300 dark:border-sky-900/40;
+  }
+
+  /* Diagram and visual aid styles */
+  .diagram-container {
+    @apply relative rounded-lg border bg-card p-6;
+  }
+
+  .flowchart-node {
+    @apply rounded-md border-2 bg-card p-4 hover:bg-muted/50 transition-colors duration-200;
+  }
+
+  .flowchart-connector {
+    @apply stroke-primary stroke-2;
+  }
+
+  /* Secret masking - blur by default, reveal on hover */
+  .secret-mask {
+    filter: blur(8px);
+    background: rgba(251, 113, 133, 0.15);
+    border-radius: 3px;
+    padding: 0 2px;
+    cursor: pointer;
+    transition: filter 0.25s ease, background 0.25s ease;
+    user-select: none;
+  }
+
+  .secret-mask:hover {
+    filter: blur(0);
+    background: rgba(251, 113, 133, 0.25);
+    user-select: text;
+  }
+}

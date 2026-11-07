@@ -1,0 +1,331 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model N8nEnvironment {
+  id          String       @id @default(cuid())
+  name        String
+  baseUrl     String
+  apiKey      String?
+  version     String?
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  workflows   Workflow[]
+  credentials Credential[]
+}
+
+model Workflow {
+  id                 String            @id
+  name               String
+  active             Boolean           @default(false)
+  nodes              String // JSON string of nodes
+  connections        String // JSON string of connections
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  securityIssues     String? // JSON string of issues
+  riskScore          Int               @default(0)
+  hasSuspiciousInput Boolean           @default(false)
+  n8nCreatedAt       DateTime?
+  n8nUpdatedAt       DateTime?
+  owner              String?
+  published          Boolean?
+  environmentId      String?
+  environment        N8nEnvironment?   @relation(fields: [environmentId], references: [id])
+  history            WorkflowHistory[]
+  executions         Execution[]
+  webhooks           Webhook[]
+}
+
+model Credential {
+  id            String         @id
+  name          String
+  type          String
+  environmentId String
+  environment   N8nEnvironment @relation(fields: [environmentId], references: [id])
+  workflows     String // JSON string array of workflow IDs using this credential
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model WorkflowHistory {
+  id          String   @id @default(cuid())
+  workflowId  String
+  workflow    Workflow @relation(fields: [workflowId], references: [id])
+  version     Int      @default(1)
+  nodes       String // JSON snapshot
+  connections String // JSON snapshot
+  createdAt   DateTime @default(now())
+}
+
+model Execution {
+  id         String    @id
+  workflowId String
+  workflow   Workflow  @relation(fields: [workflowId], references: [id])
+  status     String // success, error, running
+  startedAt  DateTime
+  finishedAt DateTime?
+  mode       String // manual, trigger, webhook, etc.
+}
+
+model Webhook {
+  id         String   @id @default(cuid())
+  workflowId String
+  workflow   Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  nodeName   String
+  method     String // GET, POST
+  path       String
+  testUrl    String
+  prodUrl    String
+  active     Boolean  @default(true)
+  type       String   @default("webhook") // "webhook" or "form"
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ScanResult {
+  id        String    @id @default(cuid())
+  scannedAt DateTime  @default(now())
+  target    String // IP or CIDR range
+  services  Service[]
+}
+
+model Service {
+  id             String       @id @default(cuid())
+  scanResultId   String
+  scanResult     ScanResult   @relation(fields: [scanResultId], references: [id])
+  ip             String
+  port           Int
+  name           String // e.g. "Ollama", "vLLM"
+  protocol       String       @default("tcp")
+  active         Boolean      @default(true)
+  status         String       @default("OPEN") // OPEN, CLOSED
+  lastVerifiedAt DateTime?
+  firstSeen      DateTime     @default(now())
+  lastSeen       DateTime     @default(now())
+  confidence     Int          @default(100)
+  details        String? // JSON details
+  models         String? // JSON array of detected model names
+  llmRequests    LLMRequest[]
+}
+
+// Shadow AI Detection Models
+model LLMRequest {
+  id              String   @id @default(cuid())
+  timestamp       DateTime @default(now())
+  sourceIp        String
+  targetIp        String
+  targetPort      Int
+  provider        String? // "openai", "ollama", "anthropic", etc.
+  model           String?
+  promptHash      String? // Hash of prompt for privacy
+  promptPreview   String? // First 200 chars of prompt for display
+  responsePreview String? // First 200 chars of response
+  riskScore       Int      @default(0)
+  isFlagged       Boolean  @default(false)
+  flags           String? // JSON array of triggered rules
+  responseTime    Int? // ms
+  dataSourceId    String? // Which source logged this request
+  serviceId       String?
+  service         Service? @relation(fields: [serviceId], references: [id])
+}
+
+model DetectionRule {
+  id        String   @id @default(cuid())
+  name      String
+  type      String // "keyword", "regex", "model_restriction", "ip_block"
+  pattern   String
+  severity  String // "low", "medium", "high", "critical"
+  points    Int      @default(10)
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model ThreatAlert {
+  id           String   @id @default(cuid())
+  timestamp    DateTime @default(now())
+  ruleId       String?
+  requestId    String?
+  severity     String
+  message      String
+  acknowledged Boolean  @default(false)
+}
+
+// Data Source Configuration for LLM Log Collection
+model DataSource {
+  id           String    @id @default(cuid())
+  name         String
+  type         String // "proxy", "api", "kafka", "scanner"
+  enabled      Boolean   @default(true)
+  config       String? // JSON configuration
+  endpoint     String? // API key or endpoint URL
+  lastActivity DateTime?
+  requestCount Int       @default(0)
+  createdAt    DateTime  @default(now())
+}
+
+// Scheduled Scans (All Discovery Modules)
+model ScheduledScan {
+  id          String    @id @default(cuid())
+  name        String
+  scanType    String    @default("network") // network, ai_spotter, skill_scanner, mcp_scanner
+  target      String // IP, CIDR, domain, repo URL, or endpoint
+  schedule    String // "once", "hourly", "daily", "weekly", or cron expression
+  enabled     Boolean   @default(true)
+  status      String    @default("pending") // pending, running, completed, failed
+  scanOptions String? // JSON — module-specific options (e.g. behavioral, llm, trigger flags)
+  lastRun     DateTime?
+  nextRun     DateTime?
+  lastResult  String? // JSON result summary
+  createdAt   DateTime  @default(now())
+}
+
+// Red Team Persistence
+model RedTeamExecution {
+  id         String          @id @default(cuid())
+  webhookId  String?
+  targetUrl  String
+  method     String          @default("POST")
+  attackType String
+  status     String // running, completed, failed
+  score      Int?
+  createdAt  DateTime        @default(now())
+  results    RedTeamResult[]
+}
+
+model RedTeamResult {
+  id          String           @id @default(cuid())
+  executionId String
+  execution   RedTeamExecution @relation(fields: [executionId], references: [id], onDelete: Cascade)
+  prompt      String
+  output      String
+  pass        Boolean
+  score       Int?
+  error       String?
+}
+
+model RedTeamSchedule {
+  id         String    @id @default(cuid())
+  name       String
+  webhookId  String? // Optional link to Webhook model
+  targetUrl  String
+  method     String    @default("POST")
+  attackType String // jailbreak, sql_injection, etc.
+  customBody String? // JSON string
+  schedule   String // cron expression or "hourly", "daily", etc.
+  enabled    Boolean   @default(true)
+  status     String    @default("pending") // pending, running, completed, failed
+  lastRun    DateTime?
+  nextRun    DateTime?
+  lastResult String? // JSON result summary (e.g. { score: 80, vulnerable: false })
+  createdAt  DateTime  @default(now())
+}
+
+// System Configuration
+model SystemSetting {
+  key         String   @id
+  value       String
+  description String?
+  isSecret    Boolean  @default(false)
+  updatedAt   DateTime @updatedAt
+}
+
+// AI Spotter Persistence
+model SpotterScan {
+  id              String   @id @default(cuid())
+  repoUrl         String
+  status          String // success, error
+  totalDetections Int      @default(0)
+  servicesFound   String? // JSON array
+  results         String? // raw JSON findings
+  error           String?
+  createdAt       DateTime @default(now())
+}
+
+// Skill Scanner Persistence
+model SkillScan {
+  id            String   @id @default(cuid())
+  target        String // path or repoUrl
+  status        String // success, error
+  hasFindings   Boolean  @default(false)
+  findingsCount Int      @default(0)
+  results       String? // raw JSON output
+  error         String?
+  createdAt     DateTime @default(now())
+}
+
+// MCP Scanner Persistence
+model McpScan {
+  id        String   @id @default(cuid())
+  target    String // url or 'auto-discovery'
+  status    String // success, error
+  isMcp     Boolean  @default(false)
+  results   String? // raw JSON details
+  error     String?
+  createdAt DateTime @default(now())
+}
+
+// AIBOM Scanner Persistence
+model AibomScan {
+  id              String   @id @default(cuid())
+  target          String // url or path
+  status          String // success, error
+  totalComponents Int      @default(0)
+  results         String? // raw JSON details
+  error           String?
+  createdAt       DateTime @default(now())
+}
+
+// Lifecycle management for security findings
+model FindingStatus {
+  id          String   @id @default(cuid())
+  fingerprint String   @unique // Hash of workflowId, nodeId, findingType, and message
+  status      String // "OPEN", "FALSE_POSITIVE", "ACCEPTED_RISK"
+  workflowId  String?
+  nodeId      String?
+  findingType String?
+  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now())
+}
+
+// Local authentication and role-based access control
+model User {
+  id           String    @id @default(cuid())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         String    @default("VIEWER") // ADMIN, ANALYST, VIEWER
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  sessions     Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model RolePermission {
+  id         String   @id @default(cuid())
+  role       String
+  permission String
+  allowed    Boolean  @default(false)
+  updatedAt  DateTime @updatedAt
+
+  @@unique([role, permission])
+  @@index([role])
+}
